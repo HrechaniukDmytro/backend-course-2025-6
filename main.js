@@ -358,32 +358,33 @@ app.delete('/inventory/:id', (req, res) => {
 /**
  * @swagger
  * /search:
- *   get:
+ *   post:
  *     summary: Пошук речі за ID
- *     description: Обробляє пошук пристрою за ID. Приймає параметри в URL.
+ *     description: Обробляє пошук пристрою за ID. Приймає дані у форматі x-www-form-urlencoded.
  *     tags: [Inventory]
- *     parameters:
- *       - in: query
- *         name: id
- *         required: true
- *         description: ID речі для пошуку
- *         schema:
- *           type: integer
- *           example: 1
- *       - in: query
- *         name: includePhoto
- *         description: Якщо "on", додає посилання на фото
- *         schema:
- *           type: string
- *           example: on
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *                 description: ID речі для пошуку
+ *                 example: 1
+ *               includePhoto:
+ *                 type: string
+ *                 description: Якщо "on", додає посилання на фото
+ *                 example: on
  *     responses:
  *       '200':
  *         description: Успішний пошук.
  *       '404':
  *         description: Not Found. Річ з таким ID не знайдено.
  */
-app.get('/search', (req, res) => {
-  const { id, includePhoto } = req.query; 
+app.post('/search', (req, res) => {
+  const { id, includePhoto } = req.body; 
   const itemId = parseInt(id, 10);
   const item = inventory.find(i => i.id === itemId);
 
@@ -392,7 +393,7 @@ app.get('/search', (req, res) => {
     return res.status(404).send('Not Found');
   }
 
-  const result = { ...item }; 
+  const result = { ...item };
   
   if (includePhoto === 'on' && result.photo) 
   {
